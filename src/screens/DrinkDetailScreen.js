@@ -1,31 +1,58 @@
 // src/screens/DrinkDetailScreen.js
 
 import React from 'react';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
 
 const DrinkDetailScreen = ({ route }) => {
-  // Recebemos os dados passados pela navegação através do objeto 'route.params'
-    const { drinkName } = route.params;
+    const { drink } = route.params;
+
+    const getIngredients = () => {
+        const ingredients = [];
+        for (let i = 1; i <= 15; i++) {
+        const ingredient = drink[`strIngredient${i}`];
+        const measure = drink[`strMeasure${i}`];
+        if (ingredient) {
+            ingredients.push(`${measure ? measure.trim() : ''} ${ingredient.trim()}`.trim());
+        }
+        }
+        return ingredients;
+    };
+
+    const ingredientsList = getIngredients();
 
     return (
-        <View style={styles.container}>
-        <Text style={styles.title}>{drinkName}</Text>
-        {/* Aqui no futuro entrarão os ingredientes, modo de preparo, etc. */}
+        <ScrollView style={styles.container}>
+        <Image source={{ uri: drink.strDrinkThumb }} style={styles.image} />
+        <View style={styles.infoContainer}>
+            <Text style={styles.title}>{drink.strDrink}</Text>
+
+            <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Ingredientes:</Text>
+            {ingredientsList.map((ingredient, index) => (
+                <Text key={index} style={styles.ingredient}>
+                • {ingredient}
+                </Text>
+            ))}
+            </View>
+
+            <View style={styles.section}>
+            <Text style={styles.sectionTitle}>Modo de Preparo:</Text>
+            <Text style={styles.instructions}>{drink.strInstructions}</Text>
+            </View>
         </View>
+        </ScrollView>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        padding: 16,
-        backgroundColor: '#f5f5f5',
-    },
-    title: {
-        fontSize: 32,
-        fontWeight: 'bold',
-        marginBottom: 16,
-    },
+    container: { flex: 1, backgroundColor: '#fff' },
+    image: { width: '100%', height: 300 },
+    infoContainer: { padding: 20 },
+    title: { fontSize: 32, fontWeight: 'bold', marginBottom: 20, textAlign: 'center' },
+    section: { marginBottom: 20 },
+    sectionTitle: { fontSize: 22, fontWeight: '700', marginBottom: 10, borderBottomWidth: 1, borderBottomColor: '#eee', paddingBottom: 5 },
+    ingredient: { fontSize: 16, lineHeight: 24 },
+    instructions: { fontSize: 16, lineHeight: 24 },
 });
 
 export default DrinkDetailScreen;
