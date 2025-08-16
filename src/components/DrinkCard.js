@@ -6,9 +6,9 @@ import { View, Text, StyleSheet, Image, TouchableOpacity } from 'react-native';
 // Por enquanto, usaremos uma imagem de placeholder
 const placeholderImage = require('../assets/placeholder.png');
 
-const DrinkCard = ({ name }) => {
+const DrinkCard = ({ name, onPress }) => {
     return (
-        <TouchableOpacity style={styles.card}>
+        <TouchableOpacity style={styles.card} onPress={onPress}>
         <Image source={placeholderImage} style={styles.image} />
         <Text style={styles.name}>{name}</Text>
         </TouchableOpacity>

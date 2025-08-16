@@ -13,12 +13,22 @@ const mockDrinks = [
     { id: '5', name: 'Cosmopolitan' },
 ];
 
-const HomeScreen = () => {
+const HomeScreen = ({ navigation }) => {
+
+    const handlePressDrink = (drink) => {
+        navigation.navigate('DrinkDetail', { drinkName: drink.name });
+    };
+
     return (
         <View style={styles.container}>
         <FlatList
             data={mockDrinks}
-            renderItem={({ item }) => <DrinkCard name={item.name} />}
+            renderItem={({ item }) => (
+                <DrinkCard 
+                    name={item.name} 
+                    onPress={() => handlePressDrink(item)} 
+                />
+            )}
             keyExtractor={item => item.id}
             ListHeaderComponent={<Text style={styles.header}>Drinks Famosos</Text>}
         />
