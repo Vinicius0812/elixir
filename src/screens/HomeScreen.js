@@ -1,27 +1,57 @@
 // src/screens/HomeScreen.js
 
 import React, { useState, useEffect, useMemo } from 'react';
-import { View, StyleSheet, FlatList, Text, ActivityIndicator, TextInput } from 'react-native';
+import {
+  View,
+  StyleSheet,
+  FlatList,
+  Text,
+  ActivityIndicator,
+  TextInput,
+  Pressable,
+  Keyboard,
+} from 'react-native';
 import DrinkCard from '../components/DrinkCard';
-import { DRINKS } from '../data/drinkData'; // 1. Importar nosso "banco de dados"
+import { loadDrinksCatalog } from '../services/drinksApi';
 import { colors, gradients } from '../theme/colors';
 
 const HomeScreen = ({ navigation }) => {
   const [allDrinks, setAllDrinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
+  const [catalogStatus, setCatalogStatus] = useState('');
+  const [catalogSource, setCatalogSource] = useState('mock');
 
   useEffect(() => {
-    // 2. Simular uma busca no banco de dados
-    const loadDrinks = () => {
-      // Usamos um timeout para simular a pequena demora de uma consulta real
-      setTimeout(() => {
-        setAllDrinks(DRINKS);
+    let isMounted = true;
+
+    const loadDrinks = async () => {
+      try {
+        const { drinks, source, statusMessage } = await loadDrinksCatalog();
+
+        if (!isMounted) {
+          return;
+        }
+
+        setAllDrinks(drinks);
+        setCatalogSource(source);
+        setCatalogStatus(statusMessage);
         setLoading(false);
-      }, 500); // 500ms de atraso
+      } catch (error) {
+        if (!isMounted) {
+          return;
+        }
+
+        setCatalogStatus('O catálogo não pôde ser carregado.');
+        setLoading(false);
+      }
     };
 
     loadDrinks();
+
+    return () => {
+      isMounted = false;
+    };
   }, []);
 
   const filteredDrinks = useMemo(
@@ -33,6 +63,7 @@ const HomeScreen = ({ navigation }) => {
   );
 
   const handlePressDrink = (drink) => {
+    Keyboard.dismiss();
     navigation.navigate('DrinkDetail', { drink: drink });
   };
 
@@ -50,6 +81,8 @@ const HomeScreen = ({ navigation }) => {
     <View style={styles.container}>
       <FlatList
         data={filteredDrinks}
+        keyboardShouldPersistTaps="handled"
+        keyboardDismissMode="on-drag"
         renderItem={({ item }) => (
           <DrinkCard
             name={item.strDrink}
@@ -69,17 +102,34 @@ const HomeScreen = ({ navigation }) => {
                 Explore receitas classicas, descubra misturas marcantes e navegue
                 por uma carta com clima noturno e elegante.
               </Text>
+              <Text style={styles.heroStatus}>{catalogStatus}</Text>
             </View>
 
             <View style={styles.searchWrapper}>
-              <TextInput
-                style={styles.searchBar}
-                placeholder="Buscar um drink..."
-                placeholderTextColor={colors.textFaint}
-                value={searchQuery}
-                onChangeText={setSearchQuery}
-              />
-              <Text style={styles.searchHint}>{filteredDrinks.length} drinks na carta</Text>
+              <View style={styles.searchField}>
+                <TextInput
+                  style={styles.searchBar}
+                  placeholder="Buscar um drink..."
+                  placeholderTextColor={colors.textFaint}
+                  value={searchQuery}
+                  onChangeText={setSearchQuery}
+                  autoCorrect={false}
+                  autoCapitalize="none"
+                  spellCheck={false}
+                />
+                {searchQuery.length > 0 ? (
+                  <Pressable
+                    onPress={() => setSearchQuery('')}
+                    style={styles.clearButton}
+                    hitSlop={10}
+                  >
+                    <Text style={styles.clearButtonText}>X</Text>
+                  </Pressable>
+                ) : null}
+              </View>
+              <Text style={styles.searchHint}>
+                {filteredDrinks.length} drinks na carta • fonte {catalogSource.toUpperCase()}
+              </Text>
             </View>
           </>
         }
@@ -169,9 +219,19 @@ const styles = StyleSheet.create({
     lineHeight: 22,
     maxWidth: '92%',
   },
+  heroStatus: {
+    color: colors.textFaint,
+    fontSize: 12,
+    lineHeight: 18,
+    marginTop: 14,
+  },
   searchWrapper: {
     marginHorizontal: 16,
     marginBottom: 6,
+  },
+  searchField: {
+    position: 'relative',
+    justifyContent: 'center',
   },
   searchBar: {
     height: 54,
@@ -179,9 +239,28 @@ const styles = StyleSheet.create({
     borderColor: colors.border,
     borderRadius: 18,
     paddingHorizontal: 16,
+    paddingRight: 52,
     backgroundColor: colors.inputBackground,
     color: colors.text,
     fontSize: 16,
+  },
+  clearButton: {
+    position: 'absolute',
+    right: 14,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surfaceSoft,
+    borderWidth: 1,
+    borderColor: colors.border,
+  },
+  clearButtonText: {
+    color: colors.textMuted,
+    fontSize: 14,
+    fontWeight: '700',
+    lineHeight: 16,
   },
   searchHint: {
     color: colors.textFaint,

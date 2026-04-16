@@ -1,94 +1,85 @@
 <div align="center">
-	<h1>🍸 Elixir</h1>
+	<h1>Elixir</h1>
 	<strong>Biblioteca Digital de Coquetelaria</strong>
 </div>
 
 ---
 
-## 🚀 Como Rodar o Aplicativo
+## Como rodar o aplicativo
 
-Para testar o Elixir no seu celular ou simulador, siga estas etapas:
+Para testar o Elixir no celular, no emulador ou no navegador:
 
 ### Pré-requisitos
-- Node.js instalado
-- App <b>Expo Go</b> no seu celular (Android/iOS)
 
-### Instalação de Dependências
+- Node.js instalado
+- Expo Go no celular, se quiser testar em dispositivo físico
+- `elixir-api` rodando localmente, se quiser consumir dados reais
+
+### Instalação de dependências
 
 ```bash
 npm install
 ```
 
-### Iniciar o Servidor
+### Configuração opcional da API
+
+Defina a URL base da API antes de iniciar o Expo:
+
+```bash
+set EXPO_PUBLIC_API_URL=http://SEU-IP-LOCAL:3000
+```
+
+Se a variável não for definida, o app usa automaticamente o catálogo local em `src/data/drinkData.js`.
+
+### Iniciar o projeto
 
 ```bash
 npx expo start
 ```
 
 ### Conexão
-1. Abra o Expo Go no celular
-2. Escaneie o QR Code que aparecerá no terminal
-3. Certifique-se de que o computador e o celular estão no mesmo Wi-Fi
+
+1. Abra o Expo Go no celular ou escolha Web/Android/iOS no terminal.
+2. Escaneie o QR Code gerado pelo Expo.
+3. Mantenha celular e computador na mesma rede se estiver usando a API local.
 
 ---
 
-## 📝 Resumo do Projeto
-O Elixir é uma biblioteca digital de coquetelaria desenvolvida em <b>React Native</b>. O app permite explorar receitas de drinks famosos, visualizar ingredientes e instruções de preparo em uma interface moderna e fluida.
+## Resumo do projeto
+
+O Elixir é um aplicativo React Native com foco em navegação de catálogo de drinks. A tela inicial tenta carregar o catálogo pela API e, se ela não estiver disponível, cai automaticamente para os dados mockados para manter a experiência utilizável.
 
 ---
 
-## 🛠️ Pilha Tecnológica
-- <b>Base:</b> React Native (Expo)
-- <b>Linguagem:</b> JavaScript (ES6+)
-- <b>Navegação:</b> React Navigation Stack
-- <b>Estilização:</b> StyleSheet (Nativo)
+## Pilha tecnológica
+
+- React Native com Expo
+- React Navigation
+- JavaScript
+- API própria com fallback para mock local
 
 ---
 
-## 📂 Estrutura de Arquivos
-O projeto segue um padrão modular para facilitar a manutenção:
-```
+## Estrutura de arquivos
+
+```text
 elixir/
-├── App.js                # Configuração de rotas e navegação
-├── src/
-│   ├── assets/           # Imagens e ícones estáticos
-│   ├── components/       # Componentes reutilizáveis (Ex: DrinkCard)
-│   ├── data/             # Banco de dados local (drinkData.js)
-│   └── screens/          # Telas (HomeScreen e DrinkDetailScreen)
+|-- App.js
+|-- src/
+|   |-- assets/           # Imagens e ícones estáticos
+|   |-- components/       # Componentes reutilizáveis
+|   |-- data/             # Fallback local do catálogo
+|   |-- screens/          # Telas principais
+|   |-- services/         # Integração com a API
+|   `-- theme/            # Paleta e tokens visuais
 ```
 
 ---
 
-## 🔍 Funcionalidades Implementadas
+## Funcionalidades atuais
 
-1. **Navegação Dinâmica**
-	- Pilha de navegação (Stack Navigator)
-	- Transição entre lista e detalhes com cabeçalho inteligente
-
-2. **Catálogo de Drinks (Mock Data)**
-	- Dados centralizados em `src/data/drinkData.js`
-	- Cada drink possui:
-	  - Nome e ID
-	  - URL da imagem (busca real)
-	  - Lista de ingredientes
-	  - Instruções passo a passo
-
-3. **UI/UX Customizada**
-	- Cards com elevação (sombra), bordas arredondadas e feedback visual
-	- Lista otimizada com FlatList para alta performance
-
-
----
-
-## 🗺️ Roadmap de Desenvolvimento
-
-- [ ] Pesquisa em Tempo Real: Barra de busca para filtrar drinks por nome
-- [ ] Filtro por Categorias: Separar por tipo de base (Gin, Vodka, Rum)
-- [ ] Favoritos: Salvar receitas localmente no dispositivo
-- [ ] Modo Noturno: Suporte a temas claros e escuros
-
----
-
-<div align="center">
-	Feito com ❤️ por Vinícius Araujo, Gepeto e Gemini
-</div>
+1. Navegação entre catálogo e detalhes do drink
+2. Busca em tempo real por nome
+3. Consumo da API quando `EXPO_PUBLIC_API_URL` está configurada
+4. Fallback automático para mock local quando a API falha, não existe ou está sem drinks publicados
+5. Indicação visual da origem dos dados na home
