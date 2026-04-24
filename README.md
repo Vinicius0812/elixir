@@ -21,15 +21,23 @@ Para testar o Elixir no celular, no emulador ou no navegador:
 npm install
 ```
 
-### Configuração opcional da API
+### Configuração da API
 
-Defina a URL base da API antes de iniciar o Expo:
+O projeto já pode usar um arquivo `.env` na raiz:
 
-```bash
-set EXPO_PUBLIC_API_URL=http://SEU-IP-LOCAL:3000
+```env
+EXPO_PUBLIC_API_URL=http://localhost:3000
 ```
 
-Se a variável não for definida, o app usa automaticamente o catálogo local em `src/data/drinkData.js`.
+Se estiver testando no celular com Expo Go, troque `localhost` pelo IP local da sua máquina.
+
+Depois reinicie o Expo com cache limpo:
+
+```bash
+npx expo start -c
+```
+
+Se a variável não for definida, o login e o cadastro ficam indisponíveis, mas o catálogo continua funcionando com fallback local.
 
 ### Iniciar o projeto
 
@@ -68,6 +76,7 @@ elixir/
 |-- src/
 |   |-- assets/           # Imagens e ícones estáticos
 |   |-- components/       # Componentes reutilizáveis
+|   |-- contexts/         # Estado global de autenticação
 |   |-- data/             # Fallback local do catálogo
 |   |-- screens/          # Telas principais
 |   |-- services/         # Integração com a API
@@ -82,4 +91,4 @@ elixir/
 2. Busca em tempo real por nome
 3. Consumo da API quando `EXPO_PUBLIC_API_URL` está configurada
 4. Fallback automático para mock local quando a API falha, não existe ou está sem drinks publicados
-5. Indicação visual da origem dos dados na home
+5. Login, cadastro e restauração de sessão com armazenamento seguro

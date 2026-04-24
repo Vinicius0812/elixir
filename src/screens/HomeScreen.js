@@ -11,11 +11,13 @@ import {
   Pressable,
   Keyboard,
 } from 'react-native';
+import { useAuth } from '../contexts/AuthContext';
 import DrinkCard from '../components/DrinkCard';
 import { loadDrinksCatalog } from '../services/drinksApi';
 import { colors, gradients } from '../theme/colors';
 
 const HomeScreen = ({ navigation }) => {
+  const { signOut, user } = useAuth();
   const [allDrinks, setAllDrinks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchQuery, setSearchQuery] = useState('');
@@ -102,7 +104,11 @@ const HomeScreen = ({ navigation }) => {
                 Explore receitas classicas, descubra misturas marcantes e navegue
                 por uma carta com clima noturno e elegante.
               </Text>
+              <Text style={styles.heroUser}>Conta ativa: {user.email}</Text>
               <Text style={styles.heroStatus}>{catalogStatus}</Text>
+              <Pressable onPress={signOut} style={styles.logoutButton}>
+                <Text style={styles.logoutButtonText}>Sair da conta</Text>
+              </Pressable>
             </View>
 
             <View style={styles.searchWrapper}>
@@ -224,6 +230,28 @@ const styles = StyleSheet.create({
     fontSize: 12,
     lineHeight: 18,
     marginTop: 14,
+  },
+  heroUser: {
+    color: colors.text,
+    fontSize: 13,
+    lineHeight: 18,
+    marginTop: 14,
+    fontWeight: '600',
+  },
+  logoutButton: {
+    marginTop: 14,
+    alignSelf: 'flex-start',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 14,
+    paddingHorizontal: 14,
+    paddingVertical: 10,
+    backgroundColor: colors.surfaceSoft,
+  },
+  logoutButtonText: {
+    color: colors.text,
+    fontSize: 13,
+    fontWeight: '700',
   },
   searchWrapper: {
     marginHorizontal: 16,
