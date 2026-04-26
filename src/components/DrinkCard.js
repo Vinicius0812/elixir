@@ -1,29 +1,45 @@
-// src/components/DrinkCard.js
-
 import React from 'react';
-import { Text, StyleSheet, Image, TouchableOpacity, View } from 'react-native';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 
-// Vamos manter o placeholder para o caso de a imagem da API falhar
 const placeholderImage = require('../assets/placeholder.png');
 
-// 1. Receber "imageUrl" como prop
-const DrinkCard = ({ name, imageUrl, onPress }) => {
-  // 2. Decidir qual imagem usar: a da API ou o placeholder
+export default function DrinkCard({
+  name,
+  imageUrl,
+  onPress,
+  isFavorite,
+}) {
   const imageSource = imageUrl ? { uri: imageUrl } : placeholderImage;
 
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.86}>
-      {/* 3. Usar a imagem correta. Note a sintaxe {{ uri: ... }} para imagens da internet */}
-      <Image source={imageSource} style={styles.image} />
-      <View style={styles.content}>
-        <Text style={styles.eyebrow}>Colecao da noite</Text>
-        <Text style={styles.name}>{name}</Text>
+    <Pressable
+      style={styles.card}
+      onPress={onPress}
+      android_ripple={{ color: colors.surfaceSoft }}
+    >
+      <View style={styles.mainButton}>
+        <Image source={imageSource} style={styles.image} />
+        <View style={styles.content}>
+          <View style={styles.metaRow}>
+            <Text style={styles.eyebrow}>Coleção da noite</Text>
+            {isFavorite ? (
+              <Ionicons
+                name="star"
+                size={14}
+                color={colors.accent}
+                style={styles.favoriteIcon}
+              />
+            ) : null}
+          </View>
+          <Text style={styles.name}>{name}</Text>
+        </View>
+        <Text style={styles.chevron}>{'>'}</Text>
       </View>
-      <Text style={styles.chevron}>{'>'}</Text>
-    </TouchableOpacity>
+    </Pressable>
   );
-};
+}
 
 const styles = StyleSheet.create({
   card: {
@@ -32,8 +48,6 @@ const styles = StyleSheet.create({
     padding: 16,
     marginVertical: 8,
     marginHorizontal: 16,
-    flexDirection: 'row',
-    alignItems: 'center',
     borderWidth: 1,
     borderColor: colors.border,
     shadowColor: colors.shadow,
@@ -44,6 +58,11 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.35,
     shadowRadius: 14,
     elevation: 7,
+  },
+  mainButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    minHeight: 58,
   },
   image: {
     width: 58,
@@ -57,12 +76,20 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
   },
+  metaRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+    marginBottom: 4,
+  },
   eyebrow: {
     color: colors.accentSoft,
     fontSize: 11,
     textTransform: 'uppercase',
     letterSpacing: 1.1,
-    marginBottom: 4,
+  },
+  favoriteIcon: {
+    marginTop: -1,
   },
   name: {
     fontSize: 18,
@@ -76,5 +103,3 @@ const styles = StyleSheet.create({
     marginTop: -2,
   },
 });
-
-export default DrinkCard;

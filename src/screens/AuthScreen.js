@@ -19,16 +19,16 @@ import { colors } from '../theme/colors';
 const modeConfig = {
   login: {
     title: 'Entre na sua conta',
-    subtitle: 'Salve seus proximos favoritos e continue de onde parou.',
+    subtitle: 'Salve seus próximos favoritos e continue de onde parou.',
     submitLabel: 'Entrar',
-    switchLabel: 'Ainda nao tem conta? Cadastre-se',
+    switchLabel: 'Ainda não tem conta? Cadastre-se',
     switchScreen: 'Register',
   },
   register: {
     title: 'Crie sua conta',
-    subtitle: 'Comece sua biblioteca pessoal de drinks com sincronizacao por conta.',
+    subtitle: 'Comece sua biblioteca pessoal de drinks com sincronização por conta.',
     submitLabel: 'Criar conta',
-    switchLabel: 'Ja tem conta? Entrar',
+    switchLabel: 'Já tem conta? Entrar',
     switchScreen: 'Login',
   },
 };
@@ -36,6 +36,7 @@ const modeConfig = {
 export default function AuthScreen({ navigation, mode = 'login' }) {
   const config = modeConfig[mode];
   const { signIn, signUp, busy, authConfigured } = useAuth();
+  const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errorMessage, setErrorMessage] = useState('');
@@ -46,8 +47,12 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
     : password.length >= 8;
 
   const disabled = useMemo(
-    () => busy || !email.trim() || !passwordIsValid,
-    [busy, email, passwordIsValid],
+    () =>
+      busy ||
+      !email.trim() ||
+      (requiresStrongPassword && !name.trim()) ||
+      !passwordIsValid,
+    [busy, email, name, passwordIsValid, requiresStrongPassword],
   );
 
   const handleSubmit = async () => {
@@ -62,7 +67,7 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
     if (!passwordIsValid) {
       setHintMessage(
         requiresStrongPassword
-          ? 'Use pelo menos 8 caracteres com letra maiuscula, minuscula, numero e caractere especial.'
+          ? 'Use pelo menos 8 caracteres com letra maiúscula, minúscula, número e caractere especial.'
           : 'Use pelo menos 8 caracteres.',
       );
       return;
@@ -74,7 +79,7 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
         return;
       }
 
-      await signUp({ email, password });
+      await signUp({ name, email, password });
     } catch (error) {
       setErrorMessage(error.message);
     }
@@ -94,12 +99,27 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
       </View>
 
       <View style={styles.formCard}>
+        {requiresStrongPassword ? (
+          <>
+            <Text style={styles.label}>Nome</Text>
+            <TextInput
+              autoCapitalize="words"
+              autoCorrect={false}
+              placeholder="Como você quer aparecer no app"
+              placeholderTextColor={colors.textFaint}
+              style={styles.input}
+              value={name}
+              onChangeText={setName}
+            />
+          </>
+        ) : null}
+
         <Text style={styles.label}>Email</Text>
         <TextInput
           autoCapitalize="none"
           autoCorrect={false}
           keyboardType="email-address"
-          placeholder="voce@exemplo.com"
+          placeholder="você@exemplo.com"
           placeholderTextColor={colors.textFaint}
           style={styles.input}
           value={email}
@@ -111,8 +131,8 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
           secureTextEntry
           placeholder={
             requiresStrongPassword
-              ? '8+ chars com maiuscula, minuscula, numero e simbolo'
-              : 'No minimo 8 caracteres'
+              ? '8+ chars com maiúscula, minúscula, número e símbolo'
+              : 'No mínimo 8 caracteres'
           }
           placeholderTextColor={colors.textFaint}
           style={styles.input}
@@ -126,8 +146,8 @@ export default function AuthScreen({ navigation, mode = 'login' }) {
 
         {requiresStrongPassword ? (
           <Text style={styles.passwordRule}>
-            A senha do cadastro precisa ter 8+ caracteres com letra maiuscula,
-            minuscula, numero e caractere especial.
+            A senha do cadastro precisa ter 8+ caracteres com letra maiúscula,
+            minúscula, número e caractere especial.
           </Text>
         ) : null}
 

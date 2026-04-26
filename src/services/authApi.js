@@ -31,7 +31,7 @@ async function request(path, options = {}) {
       ? data.message.join(' ')
       : data.message;
 
-    throw new Error(message ?? 'Nao foi possivel concluir a requisicao.');
+    throw new Error(message ?? 'Não foi possível concluir a requisição.');
   }
 
   return data;
@@ -68,7 +68,7 @@ export function getAuthConfigurationMessage() {
     return '';
   }
 
-  return 'A URL da API nao esta configurada. Reinicie o Expo depois de ajustar EXPO_PUBLIC_API_URL.';
+  return 'A URL da API não está configurada. Reinicie o Expo depois de ajustar EXPO_PUBLIC_API_URL.';
 }
 
 export function isStrongPassword(password) {

@@ -12,7 +12,7 @@ const formatMeasure = (ingredient) => {
   return `${ingredient.amount ?? ''} ${ingredient.unit ?? ''}`.trim();
 };
 
-const mapApiDrinkToAppDrink = (drink) => {
+export const mapApiDrinkToAppDrink = (drink) => {
   const baseDrink = {
     idDrink: drink.id,
     strDrink: drink.name,
@@ -41,7 +41,8 @@ export async function loadDrinksCatalog() {
     return {
       drinks: DRINKS,
       source: 'mock',
-      statusMessage: 'Usando catálogo local. Defina EXPO_PUBLIC_API_URL para integrar com a API.',
+      statusMessage:
+        'Usando catálogo local. Defina EXPO_PUBLIC_API_URL para integrar com a API.',
     };
   }
 
@@ -61,7 +62,8 @@ export async function loadDrinksCatalog() {
       return {
         drinks: DRINKS,
         source: 'mock',
-        statusMessage: 'A API respondeu sem drinks publicados. O app voltou para o catálogo local.',
+        statusMessage:
+          'A API respondeu sem drinks publicados. O app voltou para o catálogo local.',
       };
     }
 
@@ -74,7 +76,8 @@ export async function loadDrinksCatalog() {
     return {
       drinks: DRINKS,
       source: 'mock',
-      statusMessage: 'Não foi possível alcançar a API. O app continuou com o catálogo local.',
+      statusMessage:
+        'Não foi possível alcançar a API. O app continuou com o catálogo local.',
     };
   }
 }

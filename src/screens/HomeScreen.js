@@ -1,6 +1,4 @@
-// src/screens/HomeScreen.js
-
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useMemo, useState } from 'react';
 import {
   View,
   StyleSheet,
@@ -13,63 +11,33 @@ import {
 } from 'react-native';
 import { useAuth } from '../contexts/AuthContext';
 import DrinkCard from '../components/DrinkCard';
-import { loadDrinksCatalog } from '../services/drinksApi';
 import { colors, gradients } from '../theme/colors';
 
-const HomeScreen = ({ navigation }) => {
-  const { signOut, user } = useAuth();
-  const [allDrinks, setAllDrinks] = useState([]);
-  const [loading, setLoading] = useState(true);
+export default function HomeScreen({ navigation }) {
+  const {
+    user,
+    drinks,
+    catalogLoading,
+    catalogStatus,
+    catalogSource,
+    isFavorite,
+  } = useAuth();
   const [searchQuery, setSearchQuery] = useState('');
-  const [catalogStatus, setCatalogStatus] = useState('');
-  const [catalogSource, setCatalogSource] = useState('mock');
-
-  useEffect(() => {
-    let isMounted = true;
-
-    const loadDrinks = async () => {
-      try {
-        const { drinks, source, statusMessage } = await loadDrinksCatalog();
-
-        if (!isMounted) {
-          return;
-        }
-
-        setAllDrinks(drinks);
-        setCatalogSource(source);
-        setCatalogStatus(statusMessage);
-        setLoading(false);
-      } catch (error) {
-        if (!isMounted) {
-          return;
-        }
-
-        setCatalogStatus('O catálogo não pôde ser carregado.');
-        setLoading(false);
-      }
-    };
-
-    loadDrinks();
-
-    return () => {
-      isMounted = false;
-    };
-  }, []);
 
   const filteredDrinks = useMemo(
     () =>
-      allDrinks.filter(drink =>
-        drink.strDrink.toLowerCase().includes(searchQuery.toLowerCase())
+      drinks.filter((drink) =>
+        drink.strDrink.toLowerCase().includes(searchQuery.toLowerCase()),
       ),
-    [searchQuery, allDrinks]
+    [drinks, searchQuery],
   );
 
   const handlePressDrink = (drink) => {
     Keyboard.dismiss();
-    navigation.navigate('DrinkDetail', { drink: drink });
+    navigation.navigate('DrinkDetail', { drink });
   };
 
-  if (loading) {
+  if (catalogLoading) {
     return (
       <View style={styles.loadingContainer}>
         <View style={styles.loadingGlow} />
@@ -89,10 +57,11 @@ const HomeScreen = ({ navigation }) => {
           <DrinkCard
             name={item.strDrink}
             imageUrl={item.strDrinkThumb}
+            isFavorite={isFavorite(item.idDrink)}
             onPress={() => handlePressDrink(item)}
           />
         )}
-        keyExtractor={item => item.idDrink}
+        keyExtractor={(item) => item.idDrink}
         ListHeaderComponent={
           <>
             <View style={styles.hero}>
@@ -101,14 +70,13 @@ const HomeScreen = ({ navigation }) => {
               <Text style={styles.heroEyebrow}>Biblioteca de coquetelaria</Text>
               <Text style={styles.heroTitle}>Drinks com atmosfera de bar nobre.</Text>
               <Text style={styles.heroDescription}>
-                Explore receitas classicas, descubra misturas marcantes e navegue
+                Explore receitas clássicas, descubra misturas marcantes e navegue
                 por uma carta com clima noturno e elegante.
               </Text>
-              <Text style={styles.heroUser}>Conta ativa: {user.email}</Text>
-              <Text style={styles.heroStatus}>{catalogStatus}</Text>
-              <Pressable onPress={signOut} style={styles.logoutButton}>
-                <Text style={styles.logoutButtonText}>Sair da conta</Text>
-              </Pressable>
+              <Text style={styles.heroUser}>
+                Bem-vindo, {user.name?.trim() || user.email}
+              </Text>
+              {/* <Text style={styles.heroStatus}>{catalogStatus}</Text> */}
             </View>
 
             <View style={styles.searchWrapper}>
@@ -134,17 +102,20 @@ const HomeScreen = ({ navigation }) => {
                 ) : null}
               </View>
               <Text style={styles.searchHint}>
-                {filteredDrinks.length} drinks na carta • fonte {catalogSource.toUpperCase()}
+                {filteredDrinks.length} drinks na carta{/*  • fonte{' '}
+                {catalogSource.toUpperCase()} */}
               </Text>
             </View>
           </>
         }
         contentContainerStyle={styles.listContent}
-        ListEmptyComponent={<Text style={styles.emptyText}>Nenhum drink encontrado.</Text>}
+        ListEmptyComponent={
+          <Text style={styles.emptyText}>Nenhum drink encontrado.</Text>
+        }
       />
     </View>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -238,21 +209,6 @@ const styles = StyleSheet.create({
     marginTop: 14,
     fontWeight: '600',
   },
-  logoutButton: {
-    marginTop: 14,
-    alignSelf: 'flex-start',
-    borderWidth: 1,
-    borderColor: colors.border,
-    borderRadius: 14,
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    backgroundColor: colors.surfaceSoft,
-  },
-  logoutButtonText: {
-    color: colors.text,
-    fontSize: 13,
-    fontWeight: '700',
-  },
   searchWrapper: {
     marginHorizontal: 16,
     marginBottom: 6,
@@ -303,5 +259,3 @@ const styles = StyleSheet.create({
     color: colors.textMuted,
   },
 });
-
-export default HomeScreen;

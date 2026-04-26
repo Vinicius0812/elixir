@@ -1,21 +1,32 @@
-// src/screens/DrinkDetailScreen.js
-
 import React from 'react';
-import { View, Text, StyleSheet, Image, ScrollView } from 'react-native';
+import {
+  ActivityIndicator,
+  Image,
+  Pressable,
+  ScrollView,
+  StyleSheet,
+  View,
+  Text,
+} from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '../contexts/AuthContext';
 import { colors } from '../theme/colors';
 
-const DrinkDetailScreen = ({ route }) => {
+export default function DrinkDetailScreen({ route }) {
   const { drink } = route.params;
+  const { isFavorite, isFavoriteBusy, toggleFavorite } = useAuth();
 
   const getIngredients = () => {
     const ingredients = [];
 
-    for (let i = 1; i <= 15; i++) {
+    for (let i = 1; i <= 15; i += 1) {
       const ingredient = drink[`strIngredient${i}`];
       const measure = drink[`strMeasure${i}`];
 
       if (ingredient) {
-        ingredients.push(`${measure ? measure.trim() : ''} ${ingredient.trim()}`.trim());
+        ingredients.push(
+          `${measure ? measure.trim() : ''} ${ingredient.trim()}`.trim(),
+        );
       }
     }
 
@@ -23,9 +34,14 @@ const DrinkDetailScreen = ({ route }) => {
   };
 
   const ingredientsList = getIngredients();
+  const favoriteActive = isFavorite(drink.idDrink);
+  const favoriteBusy = isFavoriteBusy(drink.idDrink);
 
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.contentContainer}>
+    <ScrollView
+      style={styles.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.hero}>
         <Image source={{ uri: drink.strDrinkThumb }} style={styles.image} />
         <View style={styles.heroOverlay} />
@@ -33,9 +49,29 @@ const DrinkDetailScreen = ({ route }) => {
 
       <View style={styles.infoContainer}>
         <Text style={styles.eyebrow}>Receita selecionada</Text>
-        <Text style={styles.title}>{drink.strDrink}</Text>
+        <View style={styles.titleRow}>
+          <Text style={styles.title}>{drink.strDrink}</Text>
+          <Pressable
+            onPress={() => toggleFavorite(drink)}
+            disabled={favoriteBusy}
+            style={[
+              styles.favoriteButton,
+              favoriteBusy && styles.favoriteButtonDisabled,
+            ]}
+          >
+            {favoriteBusy ? (
+              <ActivityIndicator size="small" color={colors.accent} />
+            ) : (
+              <Ionicons
+                name={favoriteActive ? 'star' : 'star-outline'}
+                size={22}
+                color={favoriteActive ? colors.accent : colors.textMuted}
+              />
+            )}
+          </Pressable>
+        </View>
         <Text style={styles.subtitle}>
-          Uma ficha pensada para consulta rapida, preparo e inspiracao.
+          Uma ficha pensada para consulta rápida, preparo e inspiração.
         </Text>
 
         <View style={styles.section}>
@@ -55,7 +91,7 @@ const DrinkDetailScreen = ({ route }) => {
       </View>
     </ScrollView>
   );
-};
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -93,11 +129,32 @@ const styles = StyleSheet.create({
     letterSpacing: 1.4,
     marginBottom: 10,
   },
+  titleRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    gap: 12,
+  },
   title: {
+    flex: 1,
     fontSize: 32,
     fontWeight: '800',
     marginBottom: 10,
     color: colors.text,
+  },
+  favoriteButton: {
+    width: 48,
+    height: 48,
+    borderRadius: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    marginBottom: 8,
+  },
+  favoriteButtonDisabled: {
+    opacity: 0.7,
   },
   subtitle: {
     fontSize: 15,
@@ -144,5 +201,3 @@ const styles = StyleSheet.create({
     color: colors.text,
   },
 });
-
-export default DrinkDetailScreen;
